@@ -34,6 +34,7 @@ for (i in 1:5){
 set.seed(i)
 l=sample(nrow(muscle),20000,replace=FALSE)
 d=muscle[l,]
+d=data.frame(d,cell=l) #Record rownames for subsampled cells for internal evaluation
 file=paste("muscle_","20k_",i,".fcs")
 write.FCS(flowFrame(exprs=as.matrix(d)),file)
 file=paste("muscle_","20k_",i,".csv") # Some tools require csv as input, see correponding files
