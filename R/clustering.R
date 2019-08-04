@@ -4,7 +4,7 @@ library(doParallel)
 cl <- makeCluster(2)
 registerDoParallel(cl)
 library("cytofCore")
-
+load("cell_name.RData")
 depeche_res=list()
 flowsom_res=list()
 flowmeans_res=list()
@@ -17,7 +17,9 @@ for(study in c("l13","l32","sam","muscle","CC","colon")){
       testDataDepeche <- depeche(data[,1:(ncol(data)-1)])
       end=Sys.time()
       time=difftime(end, start, units = "secs")
-      int=data.frame(cell=1:nrow(data),cluster=testDataDepeche$clusterVector,label=as.integer(data[,"label"]))
+      
+      int=data.frame(cell=as.integer(data[,"cell"]),cluster=testDataDepeche$clusterVector,label=as.integer(data[,"label"]))
+      #column "cell" redorded the corresponding row of this cell in the original CyTOF data. This message would be used in internal evaluation
       colnames(int)[1]=paste("i",as.numeric(time),sep=":")
       colnames(int)[2]=study
       colnames(int)[3]=nCell
