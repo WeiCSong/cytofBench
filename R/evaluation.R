@@ -186,3 +186,184 @@ for study in c("l13","l32","sam","muscle","CC","colon")){
       }
     }
   }
+
+#kmeans
+ie_kmean=c()
+ee_kmean=c()
+for(i in c("l13","l32","sam","muscle","CC","colon")){
+  for(j in c(2,4)){
+    file=paste(i,"_",j,"0k",".mat",sep="")
+    data=readMat(file)
+    summary(data$Result[[1]][[1]])
+    for(k in 1:5){
+      clures=data.frame(cell=1:10000*j,cluster=unlist(data$Result[[k]][[1]][2]),
+      label=data$Result[[k]][[1]][6])
+      #assignment
+      D=clures
+      m=max(D[,2:3])
+      pred=factor(D[,2],levels=1:m)
+      true=factor(D[,3],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      d=as.data.frame.matrix(conf$table)
+      assign=solve_LSAP(as(10000*j-d,"matrix"))
+      assign=as.vector(assign)
+      names(assign)=1:length(assign)
+      D[,2]=assign[as.integer(D[,2])]
+      pred=factor(D[,2],levels=1:m)
+      true=factor(D[,3],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      ###ee
+      ac=conf$overall[["Accuracy"]]
+      ari=ARI(pred,true)
+      nmi=NMI(pred,true)
+      fm=FMeasure(as.integer(pred),as.integer(true),silent=TRUE)
+      row=as.vector(c(study,10000*i,j,"runtime",ac,fm,
+      nmi,ari))
+      ee_kmean=rbind(ee_kmean,row)
+      ###ie
+      exp=data.frame(data$Result[[k]][[1]][1])
+      intIdx <- intCriteria(as(exp,"matrix"),as.integer(clures[,2]),c("Calinski_Harabasz",
+      "Davies_Bouldin","Xie_Beni"))
+      row=as.vector(c(nCell=10000*j,time=i,runtime="runtime",unlist(intIdx)))
+      ie_kmean=rbind(ie_kmean,row)
+    }
+  }
+}
+
+#LDA
+ie_LDA=c()
+ee_LDA=c()
+for(i in c("l13","l32","sam","muscle","CC")){
+  for(j in c(2,4)){
+    for(k in 1:5){
+      file=paste(i,"_",j,"0k_",k,".mat",sep="")
+      data=readMat(file)
+      exp=foreach(l=1:5,.combine=rbind) %dopar% {
+        data$Result[[l]][[1]][5][[1]]
+      }
+      clures=foreach(l=1:5,.combine=rbind) %dopar% {
+        int=data.frame(fold=rep(l,4000),cluster=as.vector(data$Result[[l]][[1]][2][[1]]),
+        cluster=as.vector(data$Result[[l]][[1]][1][[1]]))
+      }
+      #assignment
+      D=clures
+      m=max(D[,2:3])
+      pred=factor(D[,2],levels=1:m)
+      true=factor(D[,3],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      d=as.data.frame.matrix(conf$table)
+      assign=solve_LSAP(as(20000*j-d,"matrix"))
+      assign=as.vector(assign)
+      names(assign)=1:length(assign)
+      D[,2]=assign[as.integer(D[,2])]
+      pred=factor(D[,2],levels=1:m)
+      true=factor(D[,3],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      ###ee
+      ac=conf$overall[["Accuracy"]]
+      ari=ARI(pred,true)
+      nmi=NMI(pred,true)
+      fm=FMeasure(as.integer(pred),as.integer(true),silent=TRUE)
+      row=as.vector(c(i,paste(j,"0k",sep=""),time=k,runtime="runtime",ac,fm,
+      nmi,ari))
+      ee_LDA=rbind(ee_LDA,row)
+      ###ie
+      intIdx <- intCriteria(as(exp,"matrix"),as.integer(clures[,2]),c("Calinski_Harabasz",
+      "Davies_Bouldin","Xie_Beni"))
+      row=as.vector(c(i,paste(j,"0k",sep=""),time=k,runtime="runtime",unlist(intIdx)))
+      ie_LDA=rbind(ie_LDA,row)
+    }
+  }
+}
+
+#Phenograph
+#Loaded RData were automatically exported by cytofkit GUI. Names of files were modified manually.
+ee_phenograph=c()
+ie_phenograph=c()
+for(
+for(i in c("l13","l32","sam","muscle","CC","colon")){
+  for(j in c(2,4)){
+    for(k in 1:5){
+      file=paste(i,"_",j,"0k_",k,".RData",sep="")
+      load(file)
+      exp=analysis_results$expressionData
+      predict=analysis_results$clusterRes[[1]]
+      true=as.vector(exp[,ncol(exp)])
+      clures=data.frame(cell=1:10000*i,true=true,cluster=predict)
+      #assignment
+      D=clures
+      m=max(D[,2:3])
+      pred=factor(D[,3],levels=1:m)
+      true=factor(D[,2],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      d=as.data.frame.matrix(conf$table)
+      assign=solve_LSAP(as(20000*j-d,"matrix"))
+      assign=as.vector(assign)
+      names(assign)=1:length(assign)
+      D[,3]=assign[as.integer(D[,3])]
+      pred=factor(D[,3],levels=1:m)
+      true=factor(D[,2],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      ###ee
+      ac=conf$overall[["Accuracy"]]
+      ari=ARI(pred,true)
+      nmi=NMI(pred,true)
+      fm=FMeasure(as.integer(pred),as.integer(true),silent=TRUE)
+      row=as.vector(c(i,paste(j,"0k",sep=""),k,runtime="runtime",ac,fm,
+      nmi,ari))
+      ee_phenograph=rbind(ee_phenograph,row)
+      ###ie
+      exp=exp[,1:ncol(exp)-1]
+      intIdx <- intCriteria(as(exp,"matrix"),as.integer(clures[,3]),c("Calinski_Harabasz",
+      "Davies_Bouldin","Xie_Beni"))
+      row=as.vector(c(i,paste(j,"0k",sep=""),k,runtime="runtime",unlist(intIdx)))
+      ie_phenograph=rbind(ie_phenograph,row)
+      }
+   }
+}
+
+#xshift  
+ee_xshift=c()
+ie_xshift=c()
+for(i in c("l13","l32","sam","muscle","CC","colon")){
+  for(j in c(2,4)){
+    for(k in 1:5){
+      file=paste(i,"_",j,"0k_",k,".fcs",sep="")
+      data=exprs(read.FCS(file))
+      clures=data.frame(data[,(ncol(data)-2):ncol(data)])
+      #assignment
+      D=clures
+      D[,3]=D[,3]+1
+      m=max(D[,2:3])
+      pred=factor(D[,3],levels=1:m)
+      true=factor(D[,2],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      d=as.data.frame.matrix(conf$table)
+      assign=solve_LSAP(as(20000*j-d,"matrix"))
+      assign=as.vector(assign)
+      names(assign)=1:length(assign)
+      D[,3]=assign[as.integer(D[,3])]
+      pred=factor(D[,3],levels=1:m)
+      true=factor(D[,2],levels=1:m)
+      conf=confusionMatrix(pred,true)
+      ###ee
+      ac=conf$overall[["Accuracy"]]
+      ari=ARI(pred,true)
+      nmi=NMI(pred,true)
+      fm=FMeasure(as.integer(pred),as.integer(true),silent=TRUE)
+      row=as.vector(c(i,paste(j,"0k",sep=""),k,runtime="runtime",ac,fm,
+      nmi,ari))
+      ee_xshift=rbind(ee_xshift,row)
+      ###ie
+      exp=data[,1:19]
+      intIdx <- intCriteria(as(exp,"matrix"),as.integer(clures[,3]),c("Calinski_Harabasz",
+      "Davies_Bouldin","Xie_Beni"))
+      row=as.vector(c(i,paste(j,"0k",sep=""),k,runtime="runtime",unlist(intIdx)))
+      ie_xshift=rbind(ie_xshift,row)
+     }
+   }
+}
+  
+  
+ 
+  
