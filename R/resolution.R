@@ -112,8 +112,10 @@ fm=FMeasure(as.integer(pred),as.integer(true),silent=TRUE)
 assign=assign[order(assign)]
 d=d[names(assign),]
 
+olon[which(olon[,"sample"] %in% 1:8),"sample"]="early"
+olon[which(olon[,"sample"] %in% 25:32),"sample"]="polyp"
 olon[which(olon[,"sample"] %in% 9:16),"sample"]="late"
-olon[which(olon[,"sample"] %in% 17:24),"sample"]="polyp"
+olon[which(olon[,"sample"] %in% 17:24),"sample"]="normal"
 D=data.frame(olon[,"sample"],predict)
 
 sample_cluster=as.data.frame.matrix(table(D))
