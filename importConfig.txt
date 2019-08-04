@@ -1,0 +1,26 @@
+#A comma-delimited list of channels in the FCS that will be used for clustering. Column indices are 1-based, i.e. the first column is 1, second column is 2 etc. 
+clustering_columns=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+
+#if the limit is different from 0, a specified amount of events get imported from the beginning of the file. This limits the total size of the dataset, which generally shall not exceed 1M cells
+limit_events_per_file=-1
+
+#Numerical transformation is essential to ensure that the expression values on each channel are approximately normally distributed. Choice of NONE, ASINH, DOUBLE_ASINH
+transformation=NONE
+
+#A factor by which each value gets divided before transformation. 5 is default, but could be set to 3 or lower in order to improve cluster separation on low-intensity channels. 
+scaling_factor=5
+
+#A specified noise threshold will be subtracted from every raw value and then all the negative values will be set to zero. This filters out low-lever noise and GREATLY improves clustering in many dimensions
+noise_threshold=0.0001
+
+#Setting this limit above 0 excludes events that have low intensity on all channels (unstained cells)
+euclidian_length_threshold=0.0
+
+#Rescaling of clustering channels may help equalizing the extent to which high- and low-expressed markers influence clustering. Choice of NONE, SD, QUANTILE
+rescale=NONE
+
+#if quantile rescaling is selected, a quantile on which the rescaling is based should be specified below:
+quantile=0.95
+
+#rescaling each file separately may help equalizing the variance between runs
+rescale_separately=false
