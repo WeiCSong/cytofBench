@@ -54,7 +54,7 @@ for(study in c("l13","l32","sam","muscle","CC","colon")){
       out=flowMeans(data[,1:(ncol(data)-1)],Standardize=FALSE)
       end=Sys.time()
       time=difftime(end, start, units = "secs")
-      int=data.frame(cell=1:nrow(data),cluster=out@Label,label=as.integer(sam[,"label"]))
+      int=data.frame(cell=1:nrow(data),cluster=out@Label,label=as.integer(data[,"label"]))
       colnames(int)[1]=paste("i",as.numeric(time),sep=":")
       colnames(int)[2]=study
       colnames(int)[3]=nCell
