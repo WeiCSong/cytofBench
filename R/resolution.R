@@ -1,10 +1,10 @@
 #This file contains code for analysis and plotting of clustering resolution, corresponding to Figure 4 & S4.
 #colon.fcs is the output of Xshift standalone.bat with whole colon data as input.
 library(cytofCore)
-olon=read.FCS("colon.fcs")
-olon=exprs(olon)
-head(olon)
-D=data.frame(olon[,20:22],stringsAsFactors = FALSE)
+colon=read.FCS("colon.fcs")
+colon=exprs(colon)
+head(colon)
+D=data.frame(colon[,20:22],stringsAsFactors = FALSE)
 D[,3]=as.numeric(D[,3])+1
 m=max(D[,2:3])
 pred=factor(D[,2],levels=1:m)
@@ -41,11 +41,11 @@ fm=FMeasure(as.integer(pred),as.integer(true),silent=TRUE)
 accense 
 #ac:0.788,ari:0.655,nmi:0.605,f:0.823
 #Column "sample" marks the sample origin of each cell.
-olon[which(olon[,"sample"] %in% 1:8),"sample"]="early"
-olon[which(olon[,"sample"] %in% 25:32),"sample"]="polyp"
-olon[which(olon[,"sample"] %in% 9:16),"sample"]="late"
-olon[which(olon[,"sample"] %in% 17:24),"sample"]="normal"
-D=data.frame(olon[,20:22])
+colon[which(colon[,"sample"] %in% 1:8),"sample"]="early"
+colon[which(colon[,"sample"] %in% 25:32),"sample"]="polyp"
+colon[which(colon[,"sample"] %in% 9:16),"sample"]="late"
+colon[which(colon[,"sample"] %in% 17:24),"sample"]="normal"
+D=data.frame(colon[,20:22])
 D[,3]=as.numeric(D[,3])+1
 sample_cluster=as.data.frame.matrix(table(D[,c(1,3)]))
 sample_cluster=apply(sample_cluster,2,f)
@@ -112,11 +112,11 @@ fm=FMeasure(as.integer(pred),as.integer(true),silent=TRUE)
 assign=assign[order(assign)]
 d=d[names(assign),]
 
-olon[which(olon[,"sample"] %in% 1:8),"sample"]="early"
-olon[which(olon[,"sample"] %in% 25:32),"sample"]="polyp"
-olon[which(olon[,"sample"] %in% 9:16),"sample"]="late"
-olon[which(olon[,"sample"] %in% 17:24),"sample"]="normal"
-D=data.frame(olon[,"sample"],predict)
+colon[which(colon[,"sample"] %in% 1:8),"sample"]="early"
+colon[which(colon[,"sample"] %in% 25:32),"sample"]="polyp"
+colon[which(colon[,"sample"] %in% 9:16),"sample"]="late"
+colon[which(colon[,"sample"] %in% 17:24),"sample"]="normal"
+D=data.frame(colon[,"sample"],predict)
 
 sample_cluster=as.data.frame.matrix(table(D))
 sample_cluster=apply(sample_cluster,2,f)
